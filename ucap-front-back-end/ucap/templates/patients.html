@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    .password {
+      font-size: 1.25em;
+      font-weight: bold;
+    }
+
+    #new_patient {
+      font-weight: bold;
+    }
+
+    #back_button {
+      display: inline-block;
+    }
+
+  </style>
+{% endblock %}
+
+{% block body %}
+
+  <div id="list_wrapper_wrapper">
+    <div id="list_wrapper">
+
+      {% if success == "patient_creation_successful" %}
+        <div class="success_flash_wrapper">
+          <p class="success_flash">Patient created with ID <b>{{ visible_patient_id }}</b>.
+          {% if password is not none %}
+            Please record the following password, as other testers will need it the first time they test this patient.
+          {% endif %}
+          </p>
+          {% if password is not none %}
+          <br/>
+          <p class="success_flash password">{{ password }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <p class="list_title">
+        Patients
+      </p>
+      <table cellspacing="0" id="list_header">
+        <tr>
+          <td class="left">
+            <form style="display:inline;" action="/api/web/search_patients" method="get" id="search_form">
+              <input type="text" name="query" placeholder="Search for patients" />
+              <a class="submit_button micro_submit_button" href="#" onclick="document.getElementById('search_form').submit();">
+                Search
+              </a>
+            </form>
+            <a id="show_all_patients" class="submit_button micro_submit_button" href="{{ url_for('web_get_patients') }}">
+              Show all
+            </a>
+            <a id="new_patient" class="submit_button micro_submit_button green_button" href="{{ url_for('web_create_patient_page') }}">
+              New patient
+            </a>
+          </td>
+          <td class="right">
+            <a class="export_as_csv" 
+              {% if 'query' in request.args %}
+                href="{{ url_for('web_search_patients', query=request.args.get('query'), csv='true') }}"
+              {% else %}
+                href="{{ url_for('web_get_patients', csv='true') }}"
+              {% endif %}
+              >
+              Export as CSV
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <table cellspacing="0" id="list">
+        <tr>
+          <th>Patient ID</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Group</th>
+          <th>Gender</th>
+          <th>Date of Birth</th>
+          <th>Notes</th>
+        </tr>
+      {% for patient in patients %}
+        <tr>
+          <td>{{patient['visible_patient_id']}}</td>
+          <td>{{patient['name']}}</td>
+          {% if patient['patient_type']|string() == 'blind' %}
+            <td>Blind</td>
+          {% elif patient['patient_type']|string() == 'non-blind' %}
+            <td>Non-blind</td>
+          {% else %}
+            <td>Anonymous</td>
+          {% endif %}
+          <td>{{patient['group']}}</td>
+          {% if patient['gender']|string() == 'female' %}
+            <td>Female</td>
+          {% elif patient['gender']|string() == 'male' %}
+            <td>Male</td>
+          {% else %}
+            <td>{{patient['gender']}}</td>
+          {% endif %}
+          <td>{{patient['dob']}}</td>
+          <td>{{patient['notes']}}</td>
+        </tr>
+      {% endfor %}
+      {% if patients | count == 0 %}
+        <tr>
+          <td id="none_to_display" colspan="7">No patients to display</td>
+        </tr>
+      {% endif %}
+      </table>
+
+    </div>
+
+    <div class="bottom_menu">
+      <a id="back_button" class="submit_button mini_submit_button gray_button" href="{{ url_for('web_main_page') }}">
+        Back
+      </a>
+      <a class="submit_button mini_submit_button" href="{{ url_for('web_logout') }}">
+        Logout
+      </a>
+    </div>
+
+  </div>
+
+{% endblock %}

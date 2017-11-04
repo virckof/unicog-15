@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    #menu_wrapper {
+      text-align: center;
+    }
+
+      #menu {
+        display: inline-block;
+      }
+
+        #menu li {
+          display: inline-block;
+          margin-left: 18px;
+        }
+
+        #menu li:first-child {
+          margin-left: 0px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+
+  <div id="menu_wrapper">
+    <ul id="menu">
+      <li>
+        <a href="{{ url_for('web_get_tests', app_code='cdt') }}" id="show_tests_button" class="category_tile colored_tile_test_1">
+          Clock-Drawing Test
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('web_get_tests', app_code='star') }}" id="show_patients_button" class="category_tile colored_tile_test_2">
+          Star Cancellation Test
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('web_get_tests', app_code='mole') }}" id="show_testers_button" class="category_tile colored_tile_test_3">
+          Whack-a-Mole Test
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="bottom_menu">
+    <a id="back_button" class="submit_button mini_submit_button gray_button" href="{{ url_for('web_main_page') }}">
+      Back
+    </a>
+    <a class="submit_button mini_submit_button" href="{{ url_for('web_logout') }}">
+      Logout
+    </a>
+  </div>
+
+{% endblock %}

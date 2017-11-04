@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    #list th#subscores_header {
+      border-bottom: 0;
+    }
+
+    #list th.subscore:first-child {
+      -moz-border-radius: 0px;
+      -webkit-border-radius: 0px;
+      border-radius: 0px;
+    }
+
+    #list th.subscore:last-child {
+      -moz-border-radius: 0px;
+      -webkit-border-radius: 0px;
+      border-radius: 0px;
+    }
+
+    #back_button {
+      display: inline-block;
+    }
+
+    .hidden_events {
+      display: none;
+    }
+
+    .toggle_hidden_events, .toggle_hidden_events:visited {
+      margin-left: 9px;
+      color: blue;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .toggle_hidden_events:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+
+      $(".toggle_hidden_events").click(function(e){
+
+        e.preventDefault();
+
+        var hidden_events = $($(this).attr('href'));
+
+        if (hidden_events.css("display") == "none"){
+          hidden_events.css("display", "inline");
+          hidden_events.next().css("display", "none");
+          hidden_events.next().next().css("display", "none");
+          hidden_events.next().next().next().css("display", "inline");
+        } else {
+          hidden_events.css("display", "none");
+          hidden_events.next().css("display", "inline");
+          hidden_events.next().next().css("display", "inline");
+          hidden_events.next().next().next().css("display", "none");
+        }
+
+      });
+
+    });
+  </script>
+{% endblock %}
+
+{% block body %}
+
+  <div id="list_wrapper_wrapper">
+    <div id="list_wrapper">
+
+      <p class="list_title">
+        {% if request.args.get('app_code') == 'cdt' %}
+          Test Results: Clock-Drawing Test
+        {% elif request.args.get('app_code') == 'star' %}
+          Test Results: Star Cancellation Test
+        {% elif request.args.get('app_code') == 'mole' %}
+          Test Results: Whack-a-Mole Test
+        {% endif %}
+      </p>
+      <table cellspacing="0" id="list_header">
+        <tr>
+          <td class="left">
+            <form style="display:inline;" action="/api/web/search_tests" method="get" id="search_form">
+              <input type="hidden" name="app_code" value="{{request.args.get('app_code')}}" />
+              <input type="text" name="query" placeholder="Search for test results" />
+              <a class="submit_button micro_submit_button" href="#" onclick="document.getElementById('search_form').submit();">
+                Search
+              </a>
+            </form>
+            <a id="show_all_tests" class="submit_button micro_submit_button" href="{{ url_for('web_get_tests', app_code=request.args.get('app_code')) }}">
+              Show all
+            </a>
+          </td>
+          <td class="right">
+            <a class="export_as_csv" 
+              {% if 'query' in request.args %}
+                href="{{ url_for('web_get_tests', app_code=request.args.get('app_code'), query=request.args.get('query'), csv='true') }}"
+              {% else %}
+                href="{{ url_for('web_get_tests', app_code=request.args.get('app_code'), csv='true') }}"
+              {% endif %}
+              >
+              {% if request.args.get('app_code') == 'mole' %}
+                Export Detailed Results as CSV
+              {% else %}
+                Export as CSV
+              {% endif %}
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <table cellspacing="0" id="list">
+
+        {% if request.args.get('app_code') == 'cdt' %}
+          <tr>
+            <th rowspan="2">ID</th>
+            <th rowspan="2">Date</th>
+            <th rowspan="2">Tester</th>
+            <th rowspan="2">Patient</th>
+            <th rowspan="2">Medium</th>
+            <th rowspan="2">Elapsed Time (sec)</th>
+            <th id="subscores_header" colspan="5">Subscore</th>
+            <th rowspan="2">Total score</th>
+            <th rowspan="2">Image</th>
+          </tr>
+          <tr>
+            <th class="subscore">1</th>
+            <th class="subscore">2</th>
+            <th class="subscore">3</th>
+            <th class="subscore">4</th>
+            <th class="subscore">5</th>
+          </tr>
+          {% for test in tests %}
+            <tr>
+              <td>{{test['id']}}</td>
+              <td>{{test['test_date']}}</td>
+              <td>{{test['tester_first_name']}} {{test['tester_last_name']}} ({{test['tester_username']}})</td>
+              <td>{{test['visible_patient_id']}}</td>
+              <td>{{test['medium']}}</td>
+              <td>{{test['elapsed_time']}}</td>
+              <td>{{test['score1']}}</td>
+              <td>{{test['score2']}}</td>
+              <td>{{test['score3']}}</td>
+              <td>{{test['score4']}}</td>
+              <td>{{test['score5']}}</td>
+              <td>{{test['total']}}</td>
+              <td><a href="{{ url_for('static', filename='test_images/'+ test['link']) }}">Image</a></td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+
+        {% if request.args.get('app_code') == 'star' %}
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Tester</th>
+            <th>Patient</th>
+            <th>Elapsed Time (sec)</th>
+            <th>Score</th>
+            <th>Score Zones</th>
+            <th>Perseverations</th>
+            <th>Latency Average (sec)</th>
+            <th>Latency S.D. (sec)</th>
+            <th>Events</th>
+          </tr>
+          {% for test in tests %}
+            <tr>
+              <td>{{test['id']}}</td>
+              <td>{{test['test_date']}}</td>
+              <td>{{test['tester_first_name']}} {{test['tester_last_name']}} ({{test['tester_username']}})</td>
+              <td>{{test['visible_patient_id']}}</td>
+              <td>{{test['elapsed_time']}}</td>
+              <td>{{test['score_total']}} / {{test['score_expected']}}</td>
+              <td>{{test['score_zones']}}</td>
+              <td>{{test['perseverations']}}</td>
+              <td>{{test['latency_average']}}</td>
+              <td>{{test['latency_sd']}}</td>
+              <td>
+                {% if test['events']|length > 47 %}
+                  {{ test['events'][:47] }}<span class="hidden_events" id="star_hidden_event{{test['id']}}">{{ test['events'][47:] }}</span>
+                  <span>...</span>
+                  <a class="toggle_hidden_events" href="#star_hidden_event{{test['id']}}">Show more</a>
+                  <a class="toggle_hidden_events" style="display:none;" href="#star_hidden_event{{test['id']}}">Show less</a>
+                {% elif test['events'] == '[]' %}
+                  No events
+                {% else %}
+                  {{ test['events'] }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+
+        {% if request.args.get('app_code') == 'mole' %}
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Tester</th>
+            <th>Patient</th>
+            <th>Target Visibility (sec)</th>
+            <th>Target Latency (sec)</th>
+            <th>Level Duration (sec)</th>
+            <th>Level Progression (%)</th>
+            <th>Hit Sound</th>
+            <th>Hit Vibration</th>
+            <th>Average Reaction Time (sec)</th>
+            <th>Reaction Time S.D. (sec)</th>
+            <th>Events</th>
+          </tr>
+          {% for test in tests %}
+            <tr>
+              <td>{{ test['id'] }}</td>
+              <td>{{ test['test_date'] }}</td>
+              <td>{{ test['tester_first_name'] }} {{ test['tester_last_name'] }} ({{ test['tester_username'] }})</td>
+              <td>{{ test['visible_patient_id'] }}</td>
+              <td>{{ ((test['target_visibility']/1000)|round(2)|string).rstrip('0').rstrip('.') }}</td>
+              <td>{{ ((test['target_latency']/1000)|round(2)|string).rstrip('0').rstrip('.') }}</td>
+              <td>{{ ((test['level_duration']/1000)|round(2)|string).rstrip('0').rstrip('.') }}</td>
+              <td>{{ ((test['level_progression']*100)|round(2)|string).rstrip('0').rstrip('.') }}</td>
+              <td>
+                {% if test['hit_sound'] == 1 %}
+                  On
+                {% else %}
+                  Off
+                {% endif %}
+              </td>
+              <td>
+                {% if test['hit_vibration'] == 1 %}
+                  On
+                {% else %}
+                  Off
+                {% endif %}
+              </td>
+              <td>{{ '%0.3f' % ((test['avg_reaction_time']|float)/1000)|float }}</td>
+              <td>{{ '%0.3f' % ((test['reaction_time_sd']|float)/1000)|float }}</td>
+              <td>
+                {% if test['events']|length > 47 %}
+                  {{  test['events'][:47]  }}<span class="hidden_events" id="mole_hidden_event{{ test['id'] }}">{{  test['events'][47:]  }}</span>
+                  <span>...</span>
+                  <a class="toggle_hidden_events" href="#mole_hidden_event{{ test['id'] }}">Show more</a>
+                  <a class="toggle_hidden_events" style="display:none;" href="#mole_hidden_event{{ test['id'] }}">Show less</a>
+                {% elif test['events'] == '[]' %}
+                  No events
+                {% else %}
+                  {{  test['events']  }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+
+        {% if tests | count == 0 %}
+          <tr>
+            <td id="none_to_display" colspan="14">No tests to display</td>
+          </tr>
+        {% endif %}
+      </table>
+
+    </div>
+
+    <div class="bottom_menu">
+      <a id="back_button" class="submit_button mini_submit_button gray_button" href="{{ url_for('web_choose_test_page') }}">
+        Back
+      </a>
+      <a class="submit_button mini_submit_button" href="{{ url_for('web_logout') }}">
+        Logout
+      </a>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+
+
+
+
+  
+
+

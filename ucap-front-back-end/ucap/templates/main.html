@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    #menu_wrapper {
+      text-align: center;
+    }
+
+      #menu {
+        display: inline-block;
+      }
+
+        #menu li {
+          display: inline-block;
+          margin-left: 18px;
+        }
+
+        #menu li:first-child {
+          margin-left: 0px;
+        }
+
+  </style>
+{% endblock %}
+
+{% block body %}
+
+  <div id="menu_wrapper">
+    <ul id="menu">
+      <li>
+        <a href="{{ url_for('web_choose_test_page') }}" class="category_tile colored_tile_main_1">
+          Test Results
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('web_get_patients') }}" class="category_tile colored_tile_main_2">
+          Patients
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('web_get_testers') }}" class="category_tile colored_tile_main_3">
+          Testers
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="bottom_menu">
+    <a class="submit_button mini_submit_button" href="{{ url_for('web_logout') }}">
+      Logout
+    </a>
+  </div>
+
+{% endblock %}

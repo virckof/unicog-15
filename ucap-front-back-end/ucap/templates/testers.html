@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    #back_button {
+      display: inline-block;
+    }
+
+  </style>
+{% endblock %}
+
+{% block body %}
+
+  <div id="list_wrapper_wrapper">
+    <div id="list_wrapper">
+
+      <p class="list_title">
+        Testers
+      </p>
+      <table cellspacing="0" id="list_header">
+        <tr>
+          <td class="left">
+            <form style="display:inline;" action="/api/web/search_testers" method="get" id="search_form">
+              <input type="text" name="query" placeholder="Search for testers" />
+              <a class="submit_button micro_submit_button" href="#" onclick="document.getElementById('search_form').submit();">
+                Search
+              </a>
+            </form>
+            <a id="show_all_testers" class="submit_button micro_submit_button" href="{{ url_for('web_get_testers') }}">
+              Show all
+            </a>
+          </td>
+          <td class="right">
+            <a class="export_as_csv" 
+              {% if 'query' in request.args %}
+                href="{{ url_for('web_search_testers', query=request.args.get('query'), csv='true') }}"
+              {% else %}
+                href="{{ url_for('web_get_testers', csv='true') }}"
+              {% endif %}
+              >
+              Export as CSV
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <table cellspacing="0" id="list">
+        <tr>
+          <th>Organization</th>
+          <th>Username</th>
+          <th>Name</th>
+        </tr>
+      {% for tester in testers %}
+        <tr>
+          <td>{{tester['organization']}}</td>
+          <td>{{tester['username']}}</td>
+          <td>{{tester['first_name']}} {{tester['last_name']}}</td>
+        </tr>
+      {% endfor %}
+      {% if testers | count == 0 %}
+        <tr>
+          <td id="none_to_display" colspan="3">No testers to display</td>
+        </tr>
+      {% endif %}
+      </table>
+
+    </div>
+
+    <div class="bottom_menu">
+      <a id="back_button" class="submit_button mini_submit_button gray_button" href="{{ url_for('web_main_page') }}">
+        Back
+      </a>
+      <a class="submit_button mini_submit_button" href="{{ url_for('web_logout') }}">
+        Logout
+      </a>
+    </div>
+
+  </div>
+
+{% endblock %}

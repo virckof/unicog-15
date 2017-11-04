@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <style type="text/css">
+
+    .form__tab {
+      width: 500px;
+      cursor: default;
+    }
+
+    .errors {
+      margin-bottom: 24px;
+    }
+
+      .error {
+        margin: 0 0 12px;
+      }
+
+  </style>
+{% endblock %}
+
+{% block body %}
+
+  <div class="form">
+    <ul class="form__tabs"><li class="form__tab form__tab--selected" id="login_tab">
+        <a class="form__tab-link" href="#login_form">
+          Create a New Patient
+        </a>
+      </li></ul>
+    <form action="/api/web/create_patient" method="post" class="form__body form__body--selected" id="create_patient_form">
+
+      {% if errors %}
+        <ul class="errors">
+          {% set error_fields = ('visible_patient_id', 'name', 'patient_type', 'group', 'gender', 'dob', 'notes') %}
+          {# First, show any general errors that don't correspond to a form field (just in a random order for now) #}
+          {% for key, val in errors.iteritems() %}
+            {% if key not in error_fields %}
+              <li class="error">
+                {{ val }}
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% for key in error_fields %}
+            {% if key in errors %}
+              <li class="error">
+                {{ errors[key] }}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <input class="form__element" id="visible_patient_id_field" type="text" name="visible_patient_id" placeholder="Patient ID" value="{{visible_patient_id}}" />
+
+      <input class="form__element" id="name_field" type="text" name="name" placeholder="Name" value="{{ name }}" />
+
+      <div class="form__element form__element--radio">
+        <label class="form__element-label">Patient Type:</label>
+        <input type="radio" name="patient_type" value="non-blind"  
+          {% if patient_type == 'non-blind' %}
+            checked
+          {% endif %}
+        > Non-blind
+        <input type="radio" name="patient_type" value="blind" 
+          {% if patient_type == 'blind' %}
+            checked
+          {% endif %}
+        > Blind
+      </div>
+
+      <input class="form__element" id="group_field" type="text" name="group" placeholder="Group" value="{{group}}" />
+
+      <div class="form__element form__element--radio">
+        <label class="form__element-label">Gender:</label>
+        <input type="radio" name="gender" value="female" 
+          {% if gender == 'female' %}
+            checked
+          {% endif %}
+        > Female
+        <input type="radio" name="gender" value="male"
+          {% if gender == 'male' %}
+            checked
+          {% endif %}
+        > Male
+      </div>
+
+      <div class="form__element form__element--dropdown">
+        <label class="form__element-label">Date of Birth:</label>
+        <select name="month">
+          <option selected="true" disabled="disabled">Month</option>
+          {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+          {% for m in months %}
+            <option 
+            {% if loop.index|string() == month|string() %}
+              selected="selected" 
+            {% endif %}
+            value="{{ loop.index }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+        <select name="day">
+          <option selected="true" disabled="disabled">Day</option>
+          {% for d in range(1, 32) %}
+            <option 
+            {% if d|string() == day|string() %}
+              selected="selected" 
+            {% endif %}
+            value="{{ d }}">{{ d }}</option>
+          {% endfor %}
+        </select>
+        <select name="year">
+          <option selected="true" disabled="disabled">Year</option>
+          {% for y in range(1900, 2017) %}
+            <option 
+            {% if y|string() == year|string() %}
+              selected="selected" 
+            {% endif %}
+            value="{{ y }}">{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <textarea class="form__element" name="notes" placeholder="Notes">{{notes}}</textarea>
+
+      <button id="create_patient_button" class="form__submit" name="submit" onclick="document.getElementById('create_patient_form').submit();" />
+        Create Patient
+      </button>
+
+    </form>
+  </div>
+
+{% endblock %}

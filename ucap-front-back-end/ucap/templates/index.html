@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+
+  <script type="text/javascript">
+  $( document ).ready(function() {
+
+    var form_id;
+    if (window.location.hash == '#register' || window.location.hash == '#login'){
+      form_id = window.location.hash;
+    } else {
+      form_id = '#login';
+    }
+
+    $('.form__tab').removeClass('form__tab--selected');
+    $(form_id+'_tab').addClass('form__tab--selected');
+
+    $('.form__body').removeClass('form__body--selected');
+    $(form_id+'_form').addClass('form__body--selected');
+
+
+    $(".form__tab-link").click(function(e){
+
+      e.preventDefault();
+
+      $('.errors').css('display', 'none');
+
+      if (!$($(this).attr('href')).hasClass('form__body--selected')){
+
+        $('.form__tab').removeClass('form__tab--selected');
+        $(this).parent().addClass('form__tab--selected');
+
+        $('.form__body').removeClass('form__body--selected');
+        $($(this).attr('href')).addClass('form__body--selected');
+
+      }
+
+    });
+
+  });
+</script>
+{% endblock %}
+
+{% block body %}
+
+  {% if success == "registration_successful" %}
+    <div class="success_flash_wrapper">
+      <p class="success_flash">Registration successful! Please email tlazar-at-ualberta-dot-ca with your username and your account will be activated within two business days.</p>
+    </div>
+  {% endif %}
+
+  <div class="form">
+    <ul class="form__tabs"><li class="form__tab form__tab--selected" id="login_tab">
+        <a class="form__tab-link" href="#login_form">
+          Login
+        </a>
+      </li><li class="form__tab" id="register_tab">
+        <a class="form__tab-link" href="#register_form">
+          Register
+        </a>
+      </li></ul>
+    <form action="/api/web/login" method="post" class="form__body form__body--selected" id="login_form">
+
+      {% if errors %}
+        <ul class="errors">
+          {# All the fields on the page, for both forms, are included in the error display for each form. It works, trust me. #}
+          {% set error_fields = ('username_or_password', 'username', 'first_name', 'last_name', 'password') %}
+          {# First, show any general errors that don't correspond to a form field (just in a random order for now) #}
+          {% for key, val in errors.iteritems() %}
+            {% if key not in error_fields %}
+              <li class="error">
+                {{ val }}
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% for key in error_fields %}
+            {% if key in errors %}
+              <li class="error">
+                {{ errors[key] }}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <input class="form__element" id="username_field" type="text" name="username" placeholder="Username" value="{{username}}" />
+      <input class="form__element" id="password_field" type="password" name="password" placeholder="Password" />
+
+      <button id="login_button" class="form__submit" name="submit" />
+        Login
+      </button>
+
+    </form>
+
+    <form action="/api/web/register#register" method="post" class="form__body" id="register_form">
+
+      {% if errors %}
+        <ul class="errors">
+          {# All the fields on the page, for both forms, are included in the error display for each form. It works, trust me. #}
+          {% set error_fields = ('username_or_password', 'email', 'organization', 'username', 'first_name', 'last_name', 'password') %}
+          {# First, show any general errors that don't correspond to a form field (just in a random order for now) #}
+          {% for key, val in errors.iteritems() %}
+            {% if key not in error_fields %}
+              <li class="error">
+                {{ val }}
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% for key in error_fields %}
+            {% if key in errors %}
+              <li class="error">
+                {{ errors[key] }}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <input class="form__element" id="username_field" type="text" name="email" placeholder="Email" value="{{email}}" />
+      <input class="form__element" id="username_field" type="text" name="organization" placeholder="Organization" value="{{organization}}" />
+      <input class="form__element" id="username_field" type="text" name="username" placeholder="Username" value="{{username}}" />
+      <input class="form__element" id="first_name_field" type="text" name="first_name" placeholder="First Name" value="{{first_name}}" />
+      <input class="form__element" id="last_name_field" type="text" name="last_name" placeholder="Last Name" value="{{last_name}}" />
+      <input class="form__element" id="password_field" type="password" name="password" placeholder="Password" />
+      <input class="form__element" id="password_again_field" type="password" name="password_again" placeholder="Confirm Password" />
+
+      <button id="register_button" class="form__submit" name="submit" onclick="document.getElementById('register_form').submit();" />
+        Register
+      </button>
+
+    </form>
+
+  </div>
+
+{% endblock %}
