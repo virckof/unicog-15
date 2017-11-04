@@ -9,3 +9,5 @@ Since April 2015, I have been developing a collection of serious mobile (Android
 UniCog shares web-based backend that centralizes the collection of information coming from all of our digital assessment and intervention tools. It provides a unified API in order to query and explore the scoring metrics produced by each of our serious games, and other digital assessment tools. This repository contains the codebases of UniCog's back end developed using Python/Flask and Javascript.
 
 You can find comprenhensive API documentation and deployment instructions in the  api-specification-v1 and dev-manual pdfs in the root of the repository. 
+
+Note: this project was originally called UCAP but has since then been renamed UniCog.
